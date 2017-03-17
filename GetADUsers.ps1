@@ -1,29 +1,32 @@
-# Retrieve ADUsers and export to CSV
-# Then run a diff against your baseline and export it to a new CSV
-# Finally rename your old baseline and change your export to your new baseline
+# Retrieve ADUsers and export to CSV and create a diff from baseline
 
 Import-Module ActiveDirectory
 
-#This will output file to c:\temp\AD_users.csv, if searching for specific OU change it in the Where-Object pipe
-Get-ADUser -filter {Enabled -eq $true} | Where-Object{$_.DistinguishedName -like "*OU=*" } | Select-Object SamAccountName | Export-CSV -NoTypeInformation "c:\temp\AD_users.csv"
+# Set filepaths for variables
+$baseline = "c:\temp\baseline.csv"
+$output = "c:\temp\AD_users.csv"
+$diff = "c:\temp\diff_" + (Get-Date -Format "MM-dd-yyyy") + ".csv."
+$ou = "*OU=*"
 
-# Look for a baseline, if it does not exist, copy AD_users.csv as the baseline
-if(!(Test-Path "c:\temp\baseline.csv")){Copy-Item "c:\temp\AD_users.csv" "c:\temp\baseline.csv"}
+# This do the lookup and create the output file
+echo "AD-Lookup running, do not close window"
+Get-ADUser -filter {Enabled -eq $true} | Where-Object{$_.DistinguishedName -like $ou } | Select-Object SamAccountName | Export-Csv -NoTypeInformation $output
+
+# Look for a baseline, if it does not exist, copy output as the baseline
+if(!(Test-Path $baseline)){Copy-Item $output $baseline}
 
 # Import both files and compare them. 
-# '<=' indicates that the name exists in baseline.csv but not AD_users.csv
-# '=>' indicates that the name exists in AD_users.csv but not baseline.csv
-$file1 = import-csv -Path "C:\temp\baseline.csv"
-$file2 = import-csv -Path "C:\temp\AD_users.csv"
-Compare-Object $file1 $file2 -property SamAccountName | Export-CSV -NoTypeInformation "c:\temp\diff.csv"
+$file1 = Import-Csv -Path $baseline
+$file2 = Import-Csv -Path $output
+Compare-Object $file1 $file2 -property SamAccountName | Export-Csv -NoTypeInformation $diff
 
 #Rename the old baseline to baseline.csv.old and the new export to baseline.csv
-Copy-Item "c:\temp\baseline.csv" "c:\temp\baseline.csv.old"
-Copy-Item "c:\temp\AD_users.csv" "c:\temp\baseline.csv"
-Remove-Item "c:\temp\AD_users.csv"
+Copy-Item $baseline "$baseline.old"
+Copy-Item $output $baseline
+Remove-Item $output
 
-echo "Results can be found in C:\Temp\diff.csv"
-echo " '<=' indicates that this user was removed"
-echo " '=>' indicates that this is a new user"
+#Replace arrows with more descriptive text in output file
+(Get-Content $diff).replace('<=', 'Removed') | Set-Content $diff
+(Get-Content $diff).replace('=>', 'New User') | Set-Content $diff
 
-PAUSE
+echo "Results can be found in $diff"
