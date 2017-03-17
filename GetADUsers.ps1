@@ -8,7 +8,7 @@ $output = "c:\temp\AD_users.csv"
 $diff = "c:\temp\diff_" + (Get-Date -Format "MM-dd-yyyy") + ".csv."
 $ou = "*OU=*"
 
-# This do the lookup and create the output file
+# Do the lookup and create the output file
 echo "AD-Lookup running, do not close window"
 Get-ADUser -filter {Enabled -eq $true} | Where-Object{$_.DistinguishedName -like $ou } | Select-Object SamAccountName | Export-Csv -NoTypeInformation $output
 
