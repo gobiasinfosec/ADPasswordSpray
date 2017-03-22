@@ -15,9 +15,7 @@ set /p output_file="Name of output file (.csv will be appended): "
 
 ::This will test every user in the password file against each password in the password file.
 ::It is set to iterate users first to prevent account lockout against passwords
-::If successful it will output the username and password to a file then delete the IPC 
-
-share
+::If successful it will output the username and password to a file then delete the IPC share
 
 for /F %%A in (%password_file%) do (
 	for /F %%B in (%user_file%) do (
