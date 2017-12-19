@@ -64,7 +64,7 @@ $monthslow = ('january', 'february', 'march', 'april', 'may', 'june', 'july', 'a
 $monthsabbr = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
 $seasons = ('Winter', 'Spring', 'Summer', 'Fall', 'Autumn', 'winter', 'spring', 'summer', 'fall', 'autumn')
 $specials = ('!', '@','$','?')
-$additional_words = ('Welcome', 'Changeme', 'Baseball', 'Football', 'Password')
+$additional_words = ('Welcome', 'Changeme', 'Baseball', 'Football', 'Password', 'Starwars')
 
 # let user know wordlist is being built
 echo "Generating wordlist based on current date"
